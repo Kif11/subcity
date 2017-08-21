@@ -1,0 +1,240 @@
+:root {
+  --error-color: #e93e3e;
+  --edit-popup-width: 200px;
+}
+
+:local(.infoBox) {
+  width: 300px;
+  height: 300px;
+  background-color: red;
+}
+
+body, html {
+  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto Slab', serif;
+  padding: 0;
+  margin: 0;
+}
+textarea {
+  resize: none;
+  border-color: #dfdfdf;
+}
+
+/* Main map canvas style */
+#map {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+/* Hide left buttom mapbox logo */
+.mapboxgl-ctrl-bottom-left {
+  visibility: hidden;
+  width: 0px;
+  height: 0px;
+}
+.mapboxgl-ctrl-bottom-right {
+  visibility: hidden;
+  width: 0px;
+  height: 0px;
+}
+
+/* All buttons style */
+:local(.button) {
+  padding: 0;
+  border-width: 0;
+  outline: none;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+  background-color: #f6f6f4;
+  color: #6b6b6b;
+  text-align: center;
+  transition: background-color .3s;
+}
+:local(.button:hover) {
+  background-color: white;
+  cursor: pointer;
+}
+:local(.button:disabled) {
+  background-color: #e3e3e3;
+  color: #b0b0b0;
+  cursor: default;
+}
+
+:local(.mapTitle) {
+  position: absolute;
+  font-size: 24px;
+  margin: 0;
+  color: #6b6b6b;
+  opacity: 0.8;
+  z-index: 1;
+  bottom: 25px;
+  left: 35px;
+}
+
+/* Marker when user click on map */
+/* XXX Currently unused */
+.map-marker {
+  width: 10px;
+  height: 10px;
+  background-color: grey;
+  border-radius: 50%;
+  opacity: 0.6;
+  cursor: pointer;
+}
+.map-marker:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+#map-popup-element {
+  height: 30px;
+}
+/* Button popup */
+:local(.buttonPopup) .mapboxgl-popup-content {
+  padding: 0px;
+}
+:local(.buttonContainer) {
+  display: flex;
+}
+:local(.buttonPopup .button) {
+  width: 30px;
+  height: 30px;
+}
+@media (max-width: 700px) {
+  :local(.buttonPopup .button) {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* Edit popup */
+@media (max-width: 700px) {
+  :local(.editPopup h4) {
+    font-size: 18px;
+  }
+  :local(.editPopup input) {
+    font-size: 16px;
+  }
+  :local(.editPopup select) {
+    font-size: 16px;
+  }
+  :local(.editPopup textarea) {
+    font-size: 16px;
+  }
+  :local(.editPopup button) {
+    font-size: 16px;
+  }
+  :local(.editPopup label) {
+    font-size: 16px;
+  }
+}
+:local(.editPopup) .edit-form h4 {
+  margin-top: 0px;
+}
+:local(.editPopup .button) {
+  width: 100%;
+  flex: 1;
+}
+:local(.uploadBtnLabel) {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+}
+:local(.editForm) {
+  display: grid;
+}
+:local(.editForm) > * {
+  margin-bottom: 5px;
+}
+:local(.editForm) h4 {
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+:local(.editForm) input {
+  height: 20px;
+  width: var(--edit-popup-width);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  border-bottom: 1px solid #dfdfdf;
+}
+:local(.editForm) textarea {
+  height: 100px;
+  width: var(--edit-popup-width);
+  outline-width: 0;
+}
+:local(.statusBar) {
+  color: var(--error-color);
+  width: var(--edit-popup-width);
+  max-width: var(--edit-popup-width);
+  max-height: 60px;
+  overflow: scroll;
+  /*margin-bottom: 10px;*/
+}
+:local(.progressBar) {
+  width: 210px;
+  /*margin-top: 10px;*/
+}
+
+/* Info popup */
+:local(.infoPopup) .mapboxgl-popup-content {
+  padding: 0;
+  width: 250px;
+  max-height: 300px;
+  overflow: hidden;
+}
+:local(#infoPopupElement) {
+  width: 250px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+}
+:local(#infoPopupElement) img {
+  width: 100%;
+}
+:local(#infoPopupElement) h4 {
+  margin: 0px;
+  padding: 8px 10px 6px 10px;
+  font-size: 14px;
+}
+:local(#infoPopupElement) p {
+  font-size: 12px;
+  margin: 0px;
+  padding: 0 8px 10px 8px;
+}
+:local(.imgContainer) {
+  width: 250px;
+  height: 140px;
+  overflow-y: hidden;
+  position: relative;
+}
+:local(.imgBtn) {
+  height: 141px;
+  width: 40px;
+  position: absolute;
+  font-size: 30px;
+  color: white;
+  background-color: transparent;
+  border: none;
+  border-radius: 0px;
+  outline-width: 0;
+  -webkit-appearance: none;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  padding-top: 57px;
+}
+:local(.imgBtn:hover) {
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+:local(#prevBtn) {
+  top: 0;
+  left: 0;
+}
+:local(#nextBtn) {
+  top: 0;
+  right: 0;
+}
+/*@media (max-width: 700px) {
+  :local(#nextBtn) {
+    transform: translate(-60px, 0px);
+  }
+}*/
