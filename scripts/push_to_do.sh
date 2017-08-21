@@ -5,6 +5,7 @@ git push
 
 ssh kiko@ubkif <<EOI
   cd /home/kiko/subcity
+  git checkout package-lock.json
   git pull
   npm install
   npm run build

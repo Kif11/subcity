@@ -17,7 +17,10 @@ body, html {
 }
 textarea {
   resize: none;
+  border-style: solid;
+  border-width: 1px;
   border-color: #dfdfdf;
+  padding: 5px;
 }
 
 /* Main map canvas style */
@@ -128,8 +131,33 @@ textarea {
     font-size: 16px;
   }
 }
-:local(.editPopup) .edit-form h4 {
+:local(.editPopup) {
+}
+:local(.editForm) {
+  display: grid;
+  width: var(--edit-popup-width);
+}
+:local(.editForm) > * {
+  /*width: var(--edit-popup-width);*/
+  width: 100%;
+  margin-bottom: 5px;
+}
+:local(.editForm) h4 {
   margin-top: 0px;
+  margin-bottom: 10px;
+
+}
+:local(.editForm) input {
+  height: 20px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  border-bottom: 1px solid #dfdfdf;
+}
+:local(.editForm) textarea {
+  height: 100px;
+  width: 188px;
+  outline-width: 0;
 }
 :local(.editPopup .button) {
   width: 100%;
@@ -140,39 +168,15 @@ textarea {
   width: 100%;
   cursor: pointer;
 }
-:local(.editForm) {
-  display: grid;
-}
-:local(.editForm) > * {
-  margin-bottom: 5px;
-}
-:local(.editForm) h4 {
-  margin-top: 0px;
-  margin-bottom: 10px;
-}
-:local(.editForm) input {
-  height: 20px;
-  width: var(--edit-popup-width);
-  border: 0;
-  outline: 0;
-  background: transparent;
-  border-bottom: 1px solid #dfdfdf;
-}
-:local(.editForm) textarea {
-  height: 100px;
-  width: var(--edit-popup-width);
-  outline-width: 0;
-}
 :local(.statusBar) {
   color: var(--error-color);
   width: var(--edit-popup-width);
-  max-width: var(--edit-popup-width);
   max-height: 60px;
   overflow: scroll;
   /*margin-bottom: 10px;*/
 }
 :local(.progressBar) {
-  width: 210px;
+  /*width: var(--edit-popup-width);*/
   /*margin-top: 10px;*/
 }
 
