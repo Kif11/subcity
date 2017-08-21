@@ -41,6 +41,8 @@ class App extends React.Component {
       circleSize: 8
     }
 
+    this.smallScreen = false;
+
     this.categories = [
       {
         name: 'Other',
@@ -91,13 +93,15 @@ class App extends React.Component {
   componentDidMount() {
     enquire.register('(max-width: 700px)', {
       match: () => {
-        console.log('Screen is less then 700px');
+        // console.log('[D] Screen is less then 700px');
+        this.smallScreen = true;
         this.setState({
           circleSize: 18
         });
       },
       unmatch: () => {
-        console.log('Screen is more then 700px');
+        // console.log('[D] Screen is more then 700px');
+        this.smallScreen = false;
         this.setState({
           circleSize: 8
         });
@@ -133,10 +137,17 @@ class App extends React.Component {
   }
 
   handleFeatureClick(map, e, feature) {
+    let center;
+    if (this.smallScreen) {
+      center = e.lngLat;
+    } else {
+      center = this.state.mapCenter;
+    }
+
     this.setState(previousState => {
       return {
         coordinates: e.lngLat,
-        mapCenter: e.lngLat,
+        mapCenter: center,
         activePopup: 'info',
         mapZoom: [previousState.mapZoom[0] + 0.0001],
         featureTitle: feature.properties.title,
