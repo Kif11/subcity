@@ -91,6 +91,22 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    // This hack is to prevent zoom on popup and other element on IOS Safari
+    // https://stackoverflow.com/questions/4389932/how-do-you-disable-viewport-zooming-on-mobile-safari
+    document.addEventListener('touchmove', function (event) {
+      if (event.scale !== 1) { event.preventDefault(); }
+    }, false);
+    // Disable double tap zoom as well
+    var lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+      var now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    // Register some media quiries here
     enquire.register('(max-width: 700px)', {
       match: () => {
         // console.log('[D] Screen is less then 700px');
