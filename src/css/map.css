@@ -19,6 +19,7 @@ body, html {
 
 @media screen and (-webkit-min-device-pixel-ratio:0)
   and (min-resolution:.001dpcm) {
+    /* Android */
     body, html {
       overflow: hidden;
     }
@@ -112,15 +113,18 @@ textarea {
   width: 30px;
   height: 30px;
 }
-@media (max-width: 700px) {
-  :local(.buttonPopup .button) {
-    width: 50px;
-    height: 50px;
-  }
-}
 
 /* Edit popup */
 @media (max-width: 700px) {
+  :local(.mapTitle) {
+    font-size: 20px;
+    bottom: 15px;
+    left: 20px;
+  }
+  :local(.buttonPopup .button) {
+    width: 40px;
+    height: 40px;
+  }
   :local(.editPopup h4) {
     font-size: 18px;
   }
@@ -135,9 +139,12 @@ textarea {
   }
   :local(.editPopup button) {
     font-size: 16px;
+    height: 30px;
   }
   :local(.editPopup label) {
     font-size: 16px;
+    height: 30px;
+    line-height: 28px;
   }
 }
 :local(.editPopup) {
@@ -148,24 +155,27 @@ textarea {
 }
 :local(.editForm) > * {
   /*width: var(--edit-popup-width);*/
-  width: 100%;
   margin-bottom: 5px;
 }
 :local(.editForm) h4 {
   margin-top: 0px;
   margin-bottom: 10px;
-
 }
 :local(.editForm) input {
   height: 20px;
   border: 0;
   outline: 0;
   background: transparent;
+  border-radius: 2px;
   border-bottom: 1px solid #dfdfdf;
+}
+:local(.editForm) select {
+  border-radius: 2px;
 }
 :local(.editForm) textarea {
   height: 100px;
   width: 188px;
+  border-radius: 2px;
   outline-width: 0;
 }
 :local(.editPopup .button) {

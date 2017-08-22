@@ -86,7 +86,11 @@ export default class EditPopup extends React.Component {
 
   componentDidMount(){
     // Focus on the first name input on this component creation
-    this.nameInput.focus();
+    // NOTE(Kirill): Time out makes it only works on Desctop
+    // otherwise the text cursor ends up outsid of input field on iOS
+    setTimeout(() => {
+      this.nameInput.focus();
+    }, 100);
   }
 
   handleImageSelect(e) {
