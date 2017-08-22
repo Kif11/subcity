@@ -1,38 +1,32 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ReactMapboxGl, { Layer, Feature, Popup } from "react-mapbox-gl";
-import axios from 'axios';
-import enquire from 'enquire.js';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ReactMapboxGl, { Layer, Feature, Popup } from 'react-mapbox-gl';
+import axios from 'axios'
+import enquire from 'enquire.js'
 
-import EditPopup from './components/edit-popup';
-import InfoPopup from './components/info-popup';
-import ButtonPopup from './components/button-popup';
+import EditPopup from './components/edit-popup'
+import InfoPopup from './components/info-popup'
+import ButtonPopup from './components/button-popup'
 
-import styles from './css/map.css';
+import styles from './css/map.css'
 
 const MapboxGl = ReactMapboxGl({
   accessToken: 'pk.eyJ1Ijoia2lmMTEiLCJhIjoiY2ozbHVoYXVuMDB5YjMybXkzMTlpOHRrdCJ9.f8F1dVwwOJhkEkTbnNoFag'
-});
-
-class InfoBox extends React.Component {
-  render() {
-    return <div className={styles.infoBox}></div>;
-  }
-}
+})
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.placesDataFile = 'data/places.json';
+  constructor (props) {
+    super(props)
+    this.placesDataFile = 'data/places.json'
     this.state = {
       places: {
-          "type": "FeatureCollection",
-          "features": [],
+        'type': 'FeatureCollection',
+        'features': []
       },
       coordinates: [0, 0],
       activePopup: null,
       mapZoom: [12],
-      mapCenter: [-122.420679, 37.772537],  // San Francisco
+      mapCenter: [-122.420679, 37.772537], // San Francisco
       featureTitle: '',
       featureCategory: '',
       featureImages: [],
@@ -41,7 +35,7 @@ class App extends React.Component {
       circleSize: 8
     }
 
-    this.smallScreen = false;
+    this.smallScreen = false
 
     this.categories = [
       {
@@ -70,75 +64,75 @@ class App extends React.Component {
       }
     ]
 
-    this.stopsCategories = [];
+    this.stopsCategories = []
     this.categories.forEach((category, i) => {
       this.stopsCategories.push([category.name, category.color])
-    });
+    })
 
     this.axios = axios.create({
       // Handle default XMLHttpRequest onprogress callback
       onUploadProgress: this.handleUploadProgress.bind(this)
-    });
+    })
   }
 
   componentWillMount () {
     // Load places fata form server
     axios.get('/getfeatures').then((res) => {
-      this.setState({places: res.data});
+      this.setState({places: res.data})
     }).catch(err => {
-      console.log('[-] Error while fetching features from server.', err);
+      console.log('[-] Error while fetching features from server.', err)
     })
   }
 
-  componentDidMount() {
+  componentDidMount () {
     // This hack is to prevent zoom on popup and other element on IOS Safari
     // https://stackoverflow.com/questions/4389932/how-do-you-disable-viewport-zooming-on-mobile-safari
     document.addEventListener('touchmove', function (event) {
-      if (event.scale !== 1) { event.preventDefault(); }
-    }, false);
+      if (event.scale !== 1) { event.preventDefault() }
+    }, false)
     // Disable double tap zoom as well
-    var lastTouchEnd = 0;
+    var lastTouchEnd = 0
     document.addEventListener('touchend', function (event) {
-      var now = (new Date()).getTime();
+      var now = (new Date()).getTime()
       if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
+        event.preventDefault()
       }
-      lastTouchEnd = now;
-    }, false);
+      lastTouchEnd = now
+    }, false)
 
     // Register some media quiries here
     enquire.register('(max-width: 700px)', {
       match: () => {
         // console.log('[D] Screen is less then 700px');
-        this.smallScreen = true;
+        this.smallScreen = true
         this.setState({
           circleSize: 18
-        });
+        })
       },
       unmatch: () => {
         // console.log('[D] Screen is more then 700px');
-        this.smallScreen = false;
+        this.smallScreen = false
         this.setState({
           circleSize: 8
-        });
+        })
       }
     })
   }
 
-  handleMapDataLoaded(data) {
-    this.setState({places: data});
+  handleMapDataLoaded (data) {
+    this.setState({places: data})
   }
 
-  handleMapClick(map, e) {
+  handleMapClick (map, e) {
     let renderFeature = map.queryRenderedFeatures(
       e.point,
       {layers: ['places']}
-    );
+    )
 
     if (renderFeature.length > 0) {
       // User click on existing feature. Skip
-      this.handleFeatureClick(map, e, renderFeature[0]);
-      return;
+      this.handleFeatureClick(map, e, renderFeature[0])
+      return
     }
 
     this.setState(previousState => {
@@ -148,16 +142,16 @@ class App extends React.Component {
         // This is mapbox-gl react bug where
         // popup position won't updata until zoom. Anoing :(
         mapZoom: [previousState.mapZoom[0] + 0.0001]
-      };
-    });
+      }
+    })
   }
 
-  handleFeatureClick(map, e, feature) {
-    let center;
+  handleFeatureClick (map, e, feature) {
+    let center
     if (this.smallScreen) {
-      center = e.lngLat;
+      center = e.lngLat
     } else {
-      center = this.state.mapCenter;
+      center = this.state.mapCenter
     }
 
     this.setState(previousState => {
@@ -171,27 +165,27 @@ class App extends React.Component {
         // This is array of images as a string. Don't forget to parse it
         featureImages: JSON.parse(feature.properties.images),
         featureDescription: feature.properties.description
-      };
-    });
+      }
+    })
   }
 
-  handleZoomEnd(e) {
-    this.setState({mapZoom: [e.getZoom()]});
+  handleZoomEnd (e) {
+    this.setState({mapZoom: [e.getZoom()]})
   }
 
-  handleDragEnd(e) {
-    this.setState({mapCenter: e.getCenter()});
+  handleDragEnd (e) {
+    this.setState({mapCenter: e.getCenter()})
   }
 
-  featureSaveSuccess(res) {
-    let feature = res.data;
+  featureSaveSuccess (res) {
+    let feature = res.data
 
     // Create a new array of features
-    let newFeatures = this.state.places.features.concat([feature]);
+    let newFeatures = this.state.places.features.concat([feature])
     // Deep copy places object
-    let newPlaces = JSON.parse(JSON.stringify(this.state.places));
+    let newPlaces = JSON.parse(JSON.stringify(this.state.places))
     // Set features to our new features
-    newPlaces.features = newFeatures;
+    newPlaces.features = newFeatures
 
     // Update state and dispalay info popup
     this.setState({
@@ -203,91 +197,90 @@ class App extends React.Component {
       activePopup: 'info',
       featureSaveStatus: '',
       uploadProgress: 0
-    });
+    })
   }
 
-  featureSaveFailure(err) {
+  featureSaveFailure (err) {
     this.setState({
       featureSaveStatus: err.response.data,
       uploadProgress: 0
-    });
-    console.log('Faled to save.', err.response.data);
+    })
+    console.log('Faled to save.', err.response.data)
   }
 
-  handleSaveClick(data) {
-    let images = data.images;
-    let form = new FormData();
+  handleSaveClick (data) {
+    let images = data.images
+    let form = new FormData()
 
     form.append('coordinates', [
       this.state.coordinates.lng,
       this.state.coordinates.lat
-    ]);
-    form.append('name', data.name);
-    form.append('category', data.category);
-    form.append('description', data.description);
+    ])
+    form.append('name', data.name)
+    form.append('category', data.category)
+    form.append('description', data.description)
 
     for (let i = 0; i < images.length; i++) {
-      form.append('images', images[i]);
+      form.append('images', images[i])
     }
 
     this.axios.post('/addfeature', form)
       .then(res => {
-        this.featureSaveSuccess(res);
+        this.featureSaveSuccess(res)
       })
       .catch(err => {
-        this.featureSaveFailure(err);
-      });
+        this.featureSaveFailure(err)
+      })
   }
 
-  handleUploadProgress(e) {
+  handleUploadProgress (e) {
     if (e.lengthComputable) {
-      let percentage = (e.loaded / e.total) * 100;
-      let progress = parseInt(percentage);
+      let percentage = (e.loaded / e.total) * 100
+      let progress = parseInt(percentage)
       // console.log('[D]' + progress + '%');
-      this.setState({uploadProgress: progress});
+      this.setState({uploadProgress: progress})
     }
   }
 
-  hanndleAddClick(e) {
+  hanndleAddClick (e) {
     this.setState({
       mapCenter: this.state.coordinates,
       activePopup: 'edit'
-    });
+    })
   }
 
-  handleCloseClick(e) {
-    this.setState({activePopup: null});
+  handleCloseClick (e) {
+    this.setState({activePopup: null})
   }
 
-  handleFeatureEnter(e) {
-    e.map.getCanvas().style.cursor = 'pointer';
+  handleFeatureEnter (e) {
+    e.map.getCanvas().style.cursor = 'pointer'
   }
 
-  handleFeatureLeave(e) {
-    e.map.getCanvas().style.cursor = 'default';
+  handleFeatureLeave (e) {
+    e.map.getCanvas().style.cursor = 'default'
   }
 
-  handleEditPopupUnmount(e) {
+  handleEditPopupUnmount (e) {
     // Clear edir error status
-    this.setState({featureSaveStatus: ''});
+    this.setState({featureSaveStatus: ''})
   }
 
-  render() {
-
+  render () {
     let paint = {
-      "circle-radius": {
-          "base": 1.5,
-          "stops": [[12, this.state.circleSize]]
+      'circle-radius': {
+        'base': 1.5,
+        'stops': [[12, this.state.circleSize]]
       },
-      "circle-color": {
-          "property": "category",
-          "type": "categorical",
-          "stops": this.stopsCategories
+      'circle-color': {
+        'property': 'category',
+        'type': 'categorical',
+        'stops': this.stopsCategories
       },
-      "circle-opacity": 0.8
+      'circle-opacity': 0.8
     }
 
-    let features = [];
+    let features = []
     this.state.places.features.forEach((feature, i) => {
       features.push(
         <Feature
@@ -296,12 +289,12 @@ class App extends React.Component {
           properties={feature.properties}
           onMouseEnter={this.handleFeatureEnter}
           onMouseLeave={this.handleFeatureLeave} />
-      );
-    });
+      )
+    })
 
-    let popup;
-    let mbClass = 'mapboxgl-popup mapboxgl-popup-anchor-bottom';
-    switch(this.state.activePopup) {
+    let popup
+    let mbClass = 'mapboxgl-popup mapboxgl-popup-anchor-bottom'
+    switch (this.state.activePopup) {
       case 'buttons':
         popup = <Popup
           className={`${mbClass} ${styles.buttonPopup}`}
@@ -310,8 +303,8 @@ class App extends React.Component {
           <ButtonPopup
             onAddClick={this.hanndleAddClick.bind(this)}
             onCloseClick={this.handleCloseClick.bind(this)} />
-        </Popup>;
-        break;
+        </Popup>
+        break
       case 'info':
         popup = <Popup
           className={`${mbClass} ${styles.infoPopup}`}
@@ -321,8 +314,8 @@ class App extends React.Component {
             title={this.state.featureTitle}
             description={this.state.featureDescription}
             images={this.state.featureImages} />
-        </Popup>;
-        break;
+        </Popup>
+        break
       case 'edit':
         popup = <Popup
           className={`${mbClass} ${styles.editPopup}`}
@@ -335,10 +328,10 @@ class App extends React.Component {
             coordinates={this.state.coordinates}
             status={this.state.featureSaveStatus}
             progress={this.state.uploadProgress} />
-        </Popup>;
-        break;
+        </Popup>
+        break
       default:
-        popup = null;
+        popup = null
     }
 
     return (
@@ -352,21 +345,21 @@ class App extends React.Component {
           onZoomEnd={this.handleZoomEnd.bind(this)}
           onDragEnd={this.handleDragEnd.bind(this)}
           containerStyle={{
-            height: "100vh",
-            width: "100vw"
+            height: '100vh',
+            width: '100vw'
           }}
           onClick={this.handleMapClick.bind(this)}>
-            <Layer
-              type="circle"
-              id="places"
-              paint={paint}>
-              {features}
-            </Layer>
-            {popup}
+          <Layer
+            type="circle"
+            id="places"
+            paint={paint}>
+            {features}
+          </Layer>
+          {popup}
         </MapboxGl>
       </div>
-    );
+    )
   }
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'))
