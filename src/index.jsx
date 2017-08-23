@@ -76,6 +76,17 @@ class App extends React.Component {
   }
 
   componentWillMount () {
+    // Get starting coordinates and zoom from URL parameters
+    // e.g. submap.tk?lat=37.7786149&lng=-122.392441&zoom=16
+    let lat = parseFloat(this.getParameterByName('lat') || 37.772537);
+    let lng = parseFloat(this.getParameterByName('lng') ||  -122.420679);
+    let zoom = parseFloat(this.getParameterByName('zoom') || 12.0);
+
+    this.setState({
+      mapCenter: [lng, lat],
+      mapZoom: [zoom]
+    });
+
     // Load places fata form server
     axios.get('/getfeatures').then((res) => {
       this.setState({places: res.data})
@@ -84,7 +95,18 @@ class App extends React.Component {
     })
   }
 
+  getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+
   componentDidMount () {
+
     // This hack is to prevent zoom on popup and other element on IOS Safari
     // https://stackoverflow.com/questions/4389932/how-do-you-disable-viewport-zooming-on-mobile-safari
     document.addEventListener('touchmove', function (event) {
