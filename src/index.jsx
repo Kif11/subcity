@@ -82,7 +82,6 @@ class App extends React.Component {
 
   updateUrl(center, zoom) {
     // Update address bar url with new map coordinates and zoom
-
     let newParms = `${document.location.origin}/?lat=${center.lat}&lng=${center.lng}&zoom=${zoom}`;
 
     history.replaceState({
@@ -208,7 +207,7 @@ class App extends React.Component {
         activePopup: 'buttons',
         // This is mapbox-gl react bug where
         // popup position won't updata until zoom. Annoying :(
-        mapZoom: [previousState.mapZoom[0] + 0.0001]
+        mapZoom: [previousState.mapZoom[0] + 0.00001]
       }
     })
   }
@@ -226,7 +225,7 @@ class App extends React.Component {
         coordinates: e.lngLat,
         mapCenter: center,
         activePopup: 'info',
-        mapZoom: [previousState.mapZoom[0] + 0.0001],
+        mapZoom: [previousState.mapZoom[0] + 0.00001],
         featureTitle: feature.properties.title,
         featureCategory: feature.properties.category,
         // This is array of images as a string. Don't forget to parse it
@@ -237,12 +236,25 @@ class App extends React.Component {
   }
 
   handleZoomEnd (e) {
+    
     let center = e.getCenter();
     let zoom = e.getZoom();
-    this.updateUrl(center, zoom);
-    this.setState({
-      mapZoom: [zoom]
+
+    // When zooming on touchscreen device this zoom callback trigered
+    // while zooming and not on the zoom end! To prevent url from updating
+    // we have to do this wacky bussines
+    let zoomDiff = Math.abs(zoom - this.state.prevZoom[0]);
+    if (zoomDiff > 0.1) {
+      this.updateUrl(center, zoom);
+    }
+
+    this.setState(previousState => {
+      return {
+        mapZoom: [zoom],
+        prevZoom: previousState.mapZoom
+      }
     });
+
   }
 
   handleDragEnd (e) {
@@ -252,6 +264,11 @@ class App extends React.Component {
     this.setState({
       mapCenter: center
     });
+  }
+
+  handlePithEnd(e) {
+    console.log('Pitch end');
+    
   }
 
   featureSaveSuccess (res) {
@@ -420,6 +437,7 @@ class App extends React.Component {
           center={this.state.mapCenter}
           zoom={this.state.mapZoom}
           onZoomEnd={this.handleZoomEnd.bind(this)}
+          onPitchEnd={this.handlePithEnd.bind(this)}
           onDragEnd={this.handleDragEnd.bind(this)}
           containerStyle={{
             height: '100vh',
