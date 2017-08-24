@@ -98,8 +98,8 @@ class App extends React.Component {
   getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-      results = regex.exec(url);
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), 
+        results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
@@ -192,11 +192,23 @@ class App extends React.Component {
   }
 
   handleZoomEnd (e) {
-    this.setState({mapZoom: [e.getZoom()]})
+    // Update url param on zoom
+    let zoom = e.getZoom();
+    let newParms = `${document.location.origin}/?lat=${this.state.mapCenter.lat}&lng=${this.state.mapCenter.lng}&zoom=${zoom}`;
+    history.pushState('', '', newParms);
+    this.setState({mapZoom: [zoom]})
   }
 
   handleDragEnd (e) {
-    this.setState({mapCenter: e.getCenter()})
+    let center = e.getCenter();
+    let lng = center.lng;
+    let lat = center.lat;
+    
+    // Update url param on drag      
+    let newParms = `${document.location.origin}/?lat=${lat}&lng=${lng}&zoom=${this.state.mapZoom}`;
+    history.pushState('', '', newParms);
+    
+    this.setState({mapCenter: center})
   }
 
   featureSaveSuccess (res) {
