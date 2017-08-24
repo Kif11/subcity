@@ -244,7 +244,7 @@ class App extends React.Component {
     // while zooming and not on the zoom end! To prevent url from updating
     // we have to do this wacky bussines
     let zoomDiff = Math.abs(zoom - this.state.prevZoom[0]);
-    if (zoomDiff > 0.1) {
+    if (zoomDiff > 1) {
       this.updateUrl(center, zoom);
     }
 
