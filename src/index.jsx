@@ -25,6 +25,7 @@ class App extends React.Component {
       },
       coordinates: [0, 0],
       activePopup: null,
+      prevZoom: [12],
       mapZoom: [12],
       mapCenter: [-122.420679, 37.772537], // San Francisco
       featureTitle: '',
@@ -73,19 +74,61 @@ class App extends React.Component {
       // Handle default XMLHttpRequest onprogress callback
       onUploadProgress: this.handleUploadProgress.bind(this)
     })
+
+    this.defaultLat = 37.772537;
+    this.defaultLng = -122.420679;
+    this.defaultZoom = 12;
+  }
+
+  updateUrl(center, zoom) {
+    // Update address bar url with new map coordinates and zoom
+
+    let newParms = `${document.location.origin}/?lat=${center.lat}&lng=${center.lng}&zoom=${zoom}`;
+
+    history.replaceState({
+      lng: center.lng,
+      lat: center.lat,
+      zoom: [zoom]
+    }, 'subcity', newParms);
+
+    this.setState({
+      mapCenter: center,
+      mapZoom: [zoom]
+    });
   }
 
   componentWillMount () {
+
+    // User click browser back button
+    window.onpopstate = (e) => {
+      let center = {lng: this.defaultLng, lat: this.defaultLat};
+      this.updateUrl(center, this.defaultZoom);
+      this.setState({
+        mapCenter: center,
+        mapZoom: this.defaultZoom
+      });
+    }
+
     // Get starting coordinates and zoom from URL parameters
     // e.g. submap.tk?lat=37.7786149&lng=-122.392441&zoom=16
-    let lat = parseFloat(this.getParameterByName('lat') || 37.772537);
-    let lng = parseFloat(this.getParameterByName('lng') ||  -122.420679);
-    let zoom = parseFloat(this.getParameterByName('zoom') || 12.0);
+    let lat = parseFloat(this.getParameterByName('lat'));
+    if (!lat) {
+      lat = this.defaultLat;
+    }
+    if (lat > 90 || lat < -90) {
+      // Latitude must be in between 90 and -90
+      lat = this.defaultLat;
+    }
+    let lng = parseFloat(this.getParameterByName('lng'));
+    if (!lng) {
+      lng = this.defaultLng;
+    }
+    let zoom = parseFloat(this.getParameterByName('zoom'));
+    if (!zoom) {
+      zoom = this.defaultZoom;
+    }
 
-    this.setState({
-      mapCenter: [lng, lat],
-      mapZoom: [zoom]
-    });
+    this.updateUrl({lng: lng, lat: lat}, zoom);
 
     // Load places fata form server
     axios.get('/getfeatures').then((res) => {
@@ -162,7 +205,7 @@ class App extends React.Component {
         coordinates: e.lngLat,
         activePopup: 'buttons',
         // This is mapbox-gl react bug where
-        // popup position won't updata until zoom. Anoing :(
+        // popup position won't updata until zoom. Annoying :(
         mapZoom: [previousState.mapZoom[0] + 0.0001]
       }
     })
@@ -192,23 +235,11 @@ class App extends React.Component {
   }
 
   handleZoomEnd (e) {
-    // Update url param on zoom
-    let zoom = e.getZoom();
-    let newParms = `${document.location.origin}/?lat=${this.state.mapCenter.lat}&lng=${this.state.mapCenter.lng}&zoom=${zoom}`;
-    history.pushState('', '', newParms);
-    this.setState({mapZoom: [zoom]})
+    this.updateUrl(e.getCenter(), e.getZoom());
   }
 
   handleDragEnd (e) {
-    let center = e.getCenter();
-    let lng = center.lng;
-    let lat = center.lat;
-    
-    // Update url param on drag      
-    let newParms = `${document.location.origin}/?lat=${lat}&lng=${lng}&zoom=${this.state.mapZoom}`;
-    history.pushState('', '', newParms);
-    
-    this.setState({mapCenter: center})
+    this.updateUrl(e.getCenter(), e.getZoom());    
   }
 
   featureSaveSuccess (res) {
