@@ -90,11 +90,6 @@ class App extends React.Component {
       lat: center.lat,
       zoom: [zoom]
     }, 'subcity', newParms);
-
-    this.setState({
-      mapCenter: center,
-      mapZoom: [zoom]
-    });
   }
 
   componentWillMount () {
@@ -128,7 +123,14 @@ class App extends React.Component {
       zoom = this.defaultZoom;
     }
 
-    this.updateUrl({lng: lng, lat: lat}, zoom);
+    let center = {lng: lng, lat: lat};
+
+    this.updateUrl(center, zoom);
+
+    this.setState({
+      mapCenter: center,
+      mapZoom: [zoom]
+    });
 
     // Load places fata form server
     axios.get('/getfeatures').then((res) => {
@@ -235,11 +237,21 @@ class App extends React.Component {
   }
 
   handleZoomEnd (e) {
-    this.updateUrl(e.getCenter(), e.getZoom());
+    let center = e.getCenter();
+    let zoom = e.getZoom();
+    this.updateUrl(center, zoom);
+    this.setState({
+      mapZoom: [zoom]
+    });
   }
 
   handleDragEnd (e) {
-    this.updateUrl(e.getCenter(), e.getZoom());    
+    let center = e.getCenter();
+    let zoom = e.getZoom();
+    this.updateUrl(center, zoom);
+    this.setState({
+      mapCenter: center
+    });
   }
 
   featureSaveSuccess (res) {
