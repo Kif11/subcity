@@ -80,10 +80,10 @@ export default class InfoPopup extends React.Component {
         <h4>
           {this.props.title}
         </h4>
-        <Linkify>
-        <p>
-          {this.props.description}
-        </p>
+        <Linkify properties={{target: '_blank'}}>
+          <p>
+            {this.props.description}
+          </p>
         </Linkify>        
       </div>
     );
