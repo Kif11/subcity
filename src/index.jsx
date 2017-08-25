@@ -147,7 +147,7 @@ class App extends React.Component {
     let center = {lng: lng, lat: lat};
 
     let markersStr = this.getParameterByName('markers');
-    if (markersStr.length) {
+    if (markersStr) {
 
       console.log('Markers String', markersStr);
       
