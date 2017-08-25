@@ -82,8 +82,14 @@ class App extends React.Component {
   }
 
   updateUrl(center, zoom) {
+    let markers = "";
+    if (this.state.markers.length !== 0) {
+      let markersUrlString = encodeURIComponent(JSON.stringify(this.state.markers));
+      markers = `&markers=${markersUrlString}`;
+    }
+
     // Update address bar url with new map coordinates and zoom
-    let newParms = `${document.location.origin}/?lat=${center.lat}&lng=${center.lng}&zoom=${zoom}`;
+    let newParms = `${document.location.origin}/?lat=${center.lat}&lng=${center.lng}&zoom=${zoom}${markers}`;
 
     history.replaceState({
       lng: center.lng,
@@ -105,12 +111,6 @@ class App extends React.Component {
     this.setState({
       markers: newMarkers
     });
-    
-    // this.setState(prevState => {
-    //   return {
-    //     markers: prevState.markers.push(newMarker)
-    //   }
-    // });
   }
 
   componentWillMount () {
@@ -125,43 +125,44 @@ class App extends React.Component {
       });
     }
 
-    // Get starting coordinates and zoom from URL parameters
-    // e.g. submap.tk?lat=37.7786149&lng=-122.392441&zoom=16
-    let lat = parseFloat(this.getParameterByName('lat'));
-    if (!lat) {
-      lat = this.defaultLat;
-    }
-    if (lat > 90 || lat < -90) {
-      // Latitude must be in between 90 and -90
-      lat = this.defaultLat;
-    }
-    let lng = parseFloat(this.getParameterByName('lng'));
-    if (!lng) {
-      lng = this.defaultLng;
-    }
-    let zoom = parseFloat(this.getParameterByName('zoom'));
-    if (!zoom) {
-      zoom = this.defaultZoom;
-    }
+    if (!window.location.search) {
+      // No quiry parameters provided. Set to default
+      let center = {lng: this.defaultLng, lat: this.defaultLat};      
+      this.updateUrl(center, this.defaultZoom);
+    } else {
+      // Get starting coordinates and zoom from URL parameters
+      // e.g. submap.tk?lat=37.7786149&lng=-122.392441&zoom=16
+      let lat = parseFloat(this.getParameterByName('lat'));
+      if (!lat) {
+        lat = this.defaultLat;
+      }
+      if (lat > 90 || lat < -90) {
+        // Latitude must be in between 90 and -90
+        lat = this.defaultLat;
+      }
+      let lng = parseFloat(this.getParameterByName('lng'));
+      if (!lng) {
+        lng = this.defaultLng;
+      }
+      let zoom = parseFloat(this.getParameterByName('zoom'));
+      if (!zoom) {
+        zoom = this.defaultZoom;
+      }
 
-    let center = {lng: lng, lat: lat};
+      let center = {lng: lng, lat: lat};
 
-    let markersStr = this.getParameterByName('markers');
-    if (markersStr) {
-
-      console.log('Markers String', markersStr);
+      let markersStr = this.getParameterByName('markers');
       
-      let markers = JSON.parse(markersStr);
-    
-      this.setState({markers: markers});
+      if (markersStr) {
+        let markers = JSON.parse(markersStr);
+        this.setState({markers: markers});
+      }
+
+      this.setState({
+        mapCenter: center,
+        mapZoom: [zoom]
+      });
     }
-
-    this.updateUrl(center, zoom);
-
-    this.setState({
-      mapCenter: center,
-      mapZoom: [zoom]
-    });
 
     // Load places fata form server
     axios.get('/getfeatures').then((res) => {
