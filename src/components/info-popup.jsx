@@ -1,4 +1,5 @@
 import React from "react";
+import Linkify from 'react-linkify';
 import placeholderImg from "../img/placeholder.jpg";
 import styles from '../css/map.css';
 
@@ -79,9 +80,11 @@ export default class InfoPopup extends React.Component {
         <h4>
           {this.props.title}
         </h4>
+        <Linkify>
         <p>
           {this.props.description}
         </p>
+        </Linkify>        
       </div>
     );
   }

@@ -40,6 +40,7 @@
     "rc-progress": "^2.2.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
+    "react-linkify": "^0.2.1",
     "react-mapbox-gl": "^2.2.0",
     "rimraf": "^2.6.1",
     "style-loader": "^0.18.2",
