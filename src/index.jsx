@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ReactMapboxGl, { Layer, Feature, Popup } from 'react-mapbox-gl';
+import ReactMapboxGl, { Layer, Feature, Popup, Marker } from 'react-mapbox-gl';
 import axios from 'axios'
 import enquire from 'enquire.js'
 
@@ -23,6 +23,7 @@ class App extends React.Component {
         'type': 'FeatureCollection',
         'features': []
       },
+      markers: [],
       coordinates: [0, 0],
       activePopup: null,
       prevZoom: [12],
@@ -91,6 +92,27 @@ class App extends React.Component {
     }, 'subcity', newParms);
   }
 
+  addMarkers(markers) {
+
+    img = img || 'favicon.png'
+    let newMarker = {
+      coordinates: coordinates,
+      img: img
+    };
+
+    let newMarkers = this.state.markers.concat([newMarker]);
+
+    this.setState({
+      markers: newMarkers
+    });
+    
+    // this.setState(prevState => {
+    //   return {
+    //     markers: prevState.markers.push(newMarker)
+    //   }
+    // });
+  }
+
   componentWillMount () {
 
     // User click browser back button
@@ -124,6 +146,16 @@ class App extends React.Component {
 
     let center = {lng: lng, lat: lat};
 
+    let markersStr = this.getParameterByName('markers');
+    if (markersStr.length) {
+
+      console.log('Markers String', markersStr);
+      
+      let markers = JSON.parse(markersStr);
+    
+      this.setState({markers: markers});
+    }
+
     this.updateUrl(center, zoom);
 
     this.setState({
@@ -142,7 +174,7 @@ class App extends React.Component {
   getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), 
+    let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), 
         results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
@@ -425,8 +457,20 @@ class App extends React.Component {
         </Popup>
         break
       default:
-        popup = null
+        popup = null;
     }
+
+    let markers = [];
+    this.state.markers.forEach((marker, i) => {
+      markers.push (
+        <Marker
+          key={i}
+          coordinates={marker.coordinates}
+          anchor="bottom">
+          <img src={marker.img}/>
+        </Marker>
+      );
+    });    
 
     return (
       <div id='app-container'>
@@ -451,6 +495,7 @@ class App extends React.Component {
             {features}
           </Layer>
           {popup}
+          {markers}
         </MapboxGl>
       </div>
     )
