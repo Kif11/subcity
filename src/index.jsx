@@ -42,7 +42,7 @@ class App extends React.Component {
     this.categories = [
       {
         name: 'Other',
-        color: '#babec2'
+        color: '#cea799'
       },
       {
         name: 'Studios',
